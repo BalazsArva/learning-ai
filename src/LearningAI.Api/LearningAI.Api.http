@@ -1,0 +1,6 @@
+@LearningAI.Api_HostAddress = http://localhost:5011
+
+GET {{LearningAI.Api_HostAddress}}/demo/
+Accept: application/json
+
+###
