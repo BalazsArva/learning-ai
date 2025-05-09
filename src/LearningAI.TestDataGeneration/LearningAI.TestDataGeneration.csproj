@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="TestData\Knowledgebase\benefits\.title" />
+    <None Remove="TestData\Knowledgebase\benefits\health-insurance.md" />
+    <None Remove="TestData\Knowledgebase\benefits\pension-savings.md" />
+    <None Remove="TestData\Knowledgebase\benefits\travel-compensation.md" />
+    <None Remove="TestData\Knowledgebase\benefits\using-the-coffee-machine.md" />
+    <None Remove="TestData\Knowledgebase\facility-information\.title" />
+    <None Remove="TestData\Knowledgebase\facility-information\parking.md" />
+    <None Remove="TestData\Knowledgebase\facility-information\pet-policy.md" />
+    <None Remove="TestData\Knowledgebase\organization-information\.title" />
+    <None Remove="TestData\Knowledgebase\organization-information\overtime-policy.md" />
+    <None Remove="TestData\Knowledgebase\organization-information\sick-leave-policy.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\Knowledgebase\benefits\.title">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\benefits\health-insurance.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\benefits\pension-savings.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\benefits\travel-compensation.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\benefits\using-the-coffee-machine.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\facility-information\.title">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\facility-information\parking.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\facility-information\pet-policy.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\organization-information\.title">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\organization-information\overtime-policy.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\organization-information\sick-leave-policy.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

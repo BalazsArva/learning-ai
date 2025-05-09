@@ -4,6 +4,10 @@ VisualStudioVersion = 17.13.35716.79
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningAI.Api", "LearningAI.Api\LearningAI.Api.csproj", "{A44E95AF-7159-4DCA-A926-0DFAAD95E88C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningAI.Api.IntegrationTests", "LearningAI.Api.IntegrationTests\LearningAI.Api.IntegrationTests.csproj", "{2DF27653-93D4-43CD-B61C-F104F0EC7437}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningAI.TestDataGeneration", "LearningAI.TestDataGeneration\LearningAI.TestDataGeneration.csproj", "{CE273198-408B-46D2-8285-F84386095A32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +18,14 @@ Global
 		{A44E95AF-7159-4DCA-A926-0DFAAD95E88C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A44E95AF-7159-4DCA-A926-0DFAAD95E88C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A44E95AF-7159-4DCA-A926-0DFAAD95E88C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DF27653-93D4-43CD-B61C-F104F0EC7437}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF27653-93D4-43CD-B61C-F104F0EC7437}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DF27653-93D4-43CD-B61C-F104F0EC7437}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DF27653-93D4-43CD-B61C-F104F0EC7437}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE273198-408B-46D2-8285-F84386095A32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE273198-408B-46D2-8285-F84386095A32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE273198-408B-46D2-8285-F84386095A32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE273198-408B-46D2-8285-F84386095A32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
