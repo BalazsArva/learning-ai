@@ -4,38 +4,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace LearningAI.Api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class KnowledgebaseController(ILogger<KnowledgebaseController> logger) : ControllerBase
 {
-    [HttpPost("directory/{parentFolderId:guid}")]
-    public async Task<IActionResult> CreateFolder(
-        Guid? parentFolderId,
-        CreateKnowledgebaseFolderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        return NoContent();
-    }
-
-    [HttpPost("directory/{parentFolderId:guid}/documents")]
+    [HttpPost("documents")]
     public async Task<IActionResult> CreateDocument(
-        Guid? parentFolderId,
         CreateKnowledgebaseDocumentRequest request,
         CancellationToken cancellationToken = default)
     {
-        return NoContent();
+        return Ok(new CreateKnowledgebaseDocumentResponse());
     }
 
-    [HttpGet("directory/{folderId:guid}/list")]
-    public async Task<IActionResult> ListDirectoryContents(
-        Guid? folderId,
-        CancellationToken cancellationToken = default)
-    {
-        return NoContent();
-    }
-
-    [HttpGet("documents/{documentId:guid}")]
+    [HttpGet("documents/{title}")]
     public async Task<IActionResult> GetDocument(
-        Guid? documentId,
+        string title,
         CancellationToken cancellationToken = default)
     {
         return NoContent();

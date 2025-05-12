@@ -8,53 +8,50 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TestData\Knowledgebase\benefits\.title" />
-    <None Remove="TestData\Knowledgebase\benefits\health-insurance.md" />
-    <None Remove="TestData\Knowledgebase\benefits\pension-savings.md" />
-    <None Remove="TestData\Knowledgebase\benefits\travel-compensation.md" />
-    <None Remove="TestData\Knowledgebase\benefits\using-the-coffee-machine.md" />
-    <None Remove="TestData\Knowledgebase\facility-information\.title" />
-    <None Remove="TestData\Knowledgebase\facility-information\parking.md" />
-    <None Remove="TestData\Knowledgebase\facility-information\pet-policy.md" />
-    <None Remove="TestData\Knowledgebase\organization-information\.title" />
-    <None Remove="TestData\Knowledgebase\organization-information\overtime-policy.md" />
-    <None Remove="TestData\Knowledgebase\organization-information\sick-leave-policy.md" />
+    <None Remove="TestData\Knowledgebase\health-insurance.md" />
+    <None Remove="TestData\Knowledgebase\overtime-policy.md" />
+    <None Remove="TestData\Knowledgebase\parking.md" />
+    <None Remove="TestData\Knowledgebase\pension-savings.md" />
+    <None Remove="TestData\Knowledgebase\pet-policy.md" />
+    <None Remove="TestData\Knowledgebase\sick-leave-policy.md" />
+    <None Remove="TestData\Knowledgebase\travel-compensation.md" />
+    <None Remove="TestData\Knowledgebase\using-the-coffee-machine.md" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="TestData\Knowledgebase\benefits\.title">
+    <Content Include="TestData\Knowledgebase\health-insurance.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Knowledgebase\benefits\health-insurance.md">
+    <Content Include="TestData\Knowledgebase\overtime-policy.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Knowledgebase\benefits\pension-savings.md">
+    <Content Include="TestData\Knowledgebase\parking.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Knowledgebase\benefits\travel-compensation.md">
+    <Content Include="TestData\Knowledgebase\pension-savings.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Knowledgebase\benefits\using-the-coffee-machine.md">
+    <Content Include="TestData\Knowledgebase\pet-policy.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Knowledgebase\facility-information\.title">
+    <Content Include="TestData\Knowledgebase\sick-leave-policy.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Knowledgebase\facility-information\parking.md">
+    <Content Include="TestData\Knowledgebase\travel-compensation.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Knowledgebase\facility-information\pet-policy.md">
+    <Content Include="TestData\Knowledgebase\using-the-coffee-machine.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Knowledgebase\organization-information\.title">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\Knowledgebase\organization-information\overtime-policy.md">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\Knowledgebase\organization-information\sick-leave-policy.md">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+    <PackageReference Include="Refit" Version="8.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
   </ItemGroup>
 
 </Project>

@@ -1,22 +1,37 @@
-﻿var rootDirectoryInfo = new DirectoryInfo("TestData/Knowledgebase");
+﻿using LearningAI.TestDataGeneration.Apis.Knowledgebase;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Formatting.Compact;
 
-var processingQueue = new Queue<DirectoryInfo>();
-
-processingQueue.Enqueue(rootDirectoryInfo);
-
-while (processingQueue.Count > 0)
+try
 {
-    var directoryInfo = processingQueue.Dequeue();
+    Log.Logger = new LoggerConfiguration()
+        .WriteTo
+        .Console(formatter: new RenderedCompactJsonFormatter())
+        .CreateLogger();
 
-    foreach (var subdir in directoryInfo.GetDirectories())
-    {
-        processingQueue.Enqueue(subdir);
-    }
+    var host = new HostBuilder()
+        .ConfigureLogging(logging =>
+        {
+            logging.AddSerilog(Log.Logger);
+        })
+        .ConfigureServices((context, services) =>
+        {
+            services.AddSingleton<KnowledgebaseTestDataGenerator>();
+            services.AddSingleton(srvProvider =>
+            {
+                return Refit.RestService.For<IKnowledgebaseApi>("http://localhost:5011");
+            });
+        })
+        .Build();
 
-    foreach (var file in directoryInfo.GetFiles())
-    {
-        Console.WriteLine(file.FullName);
-    }
+    var dataGenerator = host.Services.GetRequiredService<KnowledgebaseTestDataGenerator>();
+
+    await dataGenerator.GenerateKnowledgebaseData();
 }
-
-Console.WriteLine();
+catch (Exception e)
+{
+    Console.WriteLine($"Application failed to execute. {e.Message}");
+    throw;
+}
