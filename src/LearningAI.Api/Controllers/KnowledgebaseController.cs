@@ -35,6 +35,6 @@ public class KnowledgebaseController : ControllerBase
     {
         var result = await requestHandler.QueryAssistantAsync(new QueryAssistantRequest(request.Query), cancellationToken);
 
-        return NoContent();
+        return Ok(result);
     }
 }

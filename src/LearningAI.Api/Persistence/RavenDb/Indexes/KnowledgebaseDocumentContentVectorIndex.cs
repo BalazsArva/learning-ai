@@ -1,5 +1,4 @@
-﻿using Raven.Client.Documents;
-using Raven.Client.Documents.Indexes;
+﻿using Raven.Client.Documents.Indexes;
 
 namespace LearningAI.Api.Persistence.RavenDb.Indexes;
 
@@ -7,12 +6,12 @@ public class KnowledgebaseDocumentContentVectorIndex : AbstractIndexCreationTask
 {
     public class IndexEntry
     {
-        public RavenVector<float> Vector { get; set; } = default!;
+        public object Vector { get; set; } = default!;
     }
 
     public KnowledgebaseDocumentContentVectorIndex()
     {
-        Map = documents => documents.Select(doc => new IndexEntry { Vector = doc.Embeddings });
+        Map = documents => documents.Select(doc => new IndexEntry { Vector = CreateVector(doc.Embeddings) });
 
         VectorIndexes.Add(
             x => x.Vector,

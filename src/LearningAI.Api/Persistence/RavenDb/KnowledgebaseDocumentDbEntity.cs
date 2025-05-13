@@ -1,6 +1,4 @@
-﻿using Raven.Client.Documents;
-
-namespace LearningAI.Api.Persistence.RavenDb;
+﻿namespace LearningAI.Api.Persistence.RavenDb;
 
 public class KnowledgebaseDocumentDbEntity
 {
@@ -10,5 +8,5 @@ public class KnowledgebaseDocumentDbEntity
 
     public string Contents { get; set; } = default!;
 
-    public RavenVector<float> Embeddings { get; set; } = default!;
+    public float[] Embeddings { get; set; } = default!;
 }

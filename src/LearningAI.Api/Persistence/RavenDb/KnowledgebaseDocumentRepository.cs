@@ -14,7 +14,7 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
             Id = document.Id,
             Title = document.Title,
             Contents = document.Contents,
-            Embeddings = new(document.Embeddings.ToArray()),
+            Embeddings = document.Embeddings.ToArray(),
         };
 
         await session.StoreAsync(entity, cancellationToken);
@@ -30,11 +30,12 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
         var results = await session
             .Query<KnowledgebaseDocumentContentVectorIndex.IndexEntry, KnowledgebaseDocumentContentVectorIndex>()
             .VectorSearch(
-                x => x.WithField(doc => doc.Vector),
-                x => x.ByEmbedding(vector))
+                embeddingFieldFactory: x => x.WithField(doc => doc.Vector),
+                embeddingValueFactory: x => x.ByEmbedding(vector),
+                minimumSimilarity: 0.7f)
             .ProjectInto<KnowledgebaseDocumentDbEntity>()
             .Take(10)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return results;
     }
