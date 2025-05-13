@@ -1,8 +1,6 @@
-﻿
-namespace LearningAI.Api.RequestHandlers
+﻿namespace LearningAI.Api.RequestHandlers;
+
+public interface ICreateDocumentRequestHandler
 {
-    public interface ICreateDocumentRequestHandler
-    {
-        Task<string> CreateDocumentAsync(CreateDocumentRequest request, CancellationToken cancellationToken);
-    }
+    Task<string> CreateDocumentAsync(CreateDocumentRequest request, CancellationToken cancellationToken);
 }

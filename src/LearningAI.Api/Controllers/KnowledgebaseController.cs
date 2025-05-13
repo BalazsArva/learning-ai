@@ -6,7 +6,7 @@ namespace LearningAI.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class KnowledgebaseController(ILogger<KnowledgebaseController> logger) : ControllerBase
+public class KnowledgebaseController : ControllerBase
 {
     [HttpPost("documents")]
     public async Task<IActionResult> CreateDocument(
@@ -29,9 +29,12 @@ public class KnowledgebaseController(ILogger<KnowledgebaseController> logger) : 
 
     [HttpPost("assistant/query")]
     public async Task<IActionResult> PerformAssistantQuery(
+        [FromServices] IDocumentAssistantQueryRequestHandler requestHandler,
         KnowledgebaseAssistantQueryRequest request,
         CancellationToken cancellationToken = default)
     {
+        var result = await requestHandler.QueryAssistantAsync(new QueryAssistantRequest(request.Query), cancellationToken);
+
         return NoContent();
     }
 }
