@@ -1,4 +1,5 @@
 using LearningAI.Api.Contracts.Requests;
+using LearningAI.Api.RequestHandlers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LearningAI.Api.Controllers;
@@ -9,10 +10,13 @@ public class KnowledgebaseController(ILogger<KnowledgebaseController> logger) : 
 {
     [HttpPost("documents")]
     public async Task<IActionResult> CreateDocument(
+        [FromServices] ICreateDocumentRequestHandler requestHandler,
         CreateKnowledgebaseDocumentRequest request,
         CancellationToken cancellationToken = default)
     {
-        return Ok(new CreateKnowledgebaseDocumentResponse());
+        var id = await requestHandler.CreateDocumentAsync(new CreateDocumentRequest(request.Title, request.Content), cancellationToken);
+
+        return Ok(new CreateKnowledgebaseDocumentResponse(id));
     }
 
     [HttpGet("documents/{title}")]

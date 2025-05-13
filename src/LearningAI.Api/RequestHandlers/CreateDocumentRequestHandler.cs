@@ -10,10 +10,12 @@ public class CreateDocumentRequestHandler(
 {
     public async Task<string> CreateDocumentAsync(CreateDocumentRequest request, CancellationToken cancellationToken)
     {
-        var contentsEmbedding = await embeddingGenerator.GenerateVectorAsync(request.Contents, cancellationToken: cancellationToken);
         var id = Guid.NewGuid().ToString();
+        var contentsEmbedding = await embeddingGenerator.GenerateEmbeddingVectorAsync(request.Contents, cancellationToken: cancellationToken);
 
         await repository.SaveDocumentAsync(new(id, request.Title, request.Contents, contentsEmbedding), cancellationToken);
+
+        logger.LogInformation("Created document with Id={Id} Title={Title}", id, request.Title);
 
         return id;
     }
