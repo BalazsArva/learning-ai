@@ -14,7 +14,7 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
             Id = document.Id,
             Title = document.Title,
             Contents = document.Contents,
-            Embeddings = document.Embeddings.ToArray(),
+            Embeddings = new RavenVector<float>(document.Embeddings.ToArray()),
         };
 
         await session.StoreAsync(entity, cancellationToken);
