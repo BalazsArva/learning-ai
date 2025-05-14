@@ -13,22 +13,24 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOptionsWithValidateOnStart<RavenDbOptions>().BindConfiguration(RavenDbOptions.SectionName);
+builder.Services.AddOptionsWithValidateOnStart<AzureOpenAIOptions>().BindConfiguration(AzureOpenAIOptions.SectionName);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder
     .Services
-    .AddChatClient(new ChatClientBuilder(services =>
+    .AddChatClient(services =>
     {
-        const string ModelId = "gpt-4o";
+        var opts = services.GetRequiredService<IOptions<AzureOpenAIOptions>>().Value;
 
-        var url = builder.Configuration["AzureOpenAI:Endpoint"]!;
-        var apikey = builder.Configuration["AzureOpenAI:ApiKey"]!;
-
-        return new AzureOpenAIClient(new Uri(url), new ApiKeyCredential(apikey)).GetChatClient(ModelId).AsIChatClient();
-    })
-    .Build());
+        return
+            new ChatClientBuilder(
+                new AzureOpenAIClient(new Uri(opts.Endpoint), new ApiKeyCredential(opts.ApiKey))
+                    .GetChatClient(opts.ModelId)
+                    .AsIChatClient())
+                .Build();
+    });
 
 builder.Services.AddSingleton<ICreateDocumentRequestHandler, CreateDocumentRequestHandler>();
 builder.Services.AddSingleton<IDocumentAssistantQueryRequestHandler, DocumentAssistantQueryRequestHandler>();
