@@ -11,7 +11,7 @@ public class CreateDocumentRequestHandler(
     public async Task<string> CreateDocumentAsync(CreateDocumentRequest request, CancellationToken cancellationToken)
     {
         var id = Guid.NewGuid().ToString();
-        var contentsEmbedding = await embeddingGenerator.GenerateEmbeddingVectorAsync(request.Contents, cancellationToken: cancellationToken);
+        var contentsEmbedding = await embeddingGenerator.GenerateVectorAsync(request.Contents, cancellationToken: cancellationToken);
 
         await repository.SaveDocumentAsync(new(id, request.Title, request.Contents, contentsEmbedding), cancellationToken);
 

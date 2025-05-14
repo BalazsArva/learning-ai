@@ -40,7 +40,7 @@ builder.Services.AddSingleton((serviceProvider) =>
         }
         .Initialize();
 });
-builder.AddOllamaSharpEmbeddingGenerator("ollama", opts => opts.SelectedModel = "all-minilm");
+builder.AddOllamaApiClient("ollama", opts => opts.SelectedModel = "all-minilm").AddEmbeddingGenerator();
 
 var app = builder.Build();
 
