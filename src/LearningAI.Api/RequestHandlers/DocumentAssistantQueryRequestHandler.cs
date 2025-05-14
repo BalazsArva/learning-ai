@@ -36,11 +36,12 @@ public class DocumentAssistantQueryRequestHandler(
     {
         var kbTools = knowledgebaseToolsFactory();
         var searchKbTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByContentSemanticsAsync);
+        var getDocumentUrlTool = AIFunctionFactory.Create(kbTools.GetUriForDocumentAsync);
 
         return new ChatOptions
         {
             AllowMultipleToolCalls = true,
-            Tools = [searchKbTool],
+            Tools = [searchKbTool, getDocumentUrlTool],
         };
     }
 }
