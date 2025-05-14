@@ -27,7 +27,7 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
 
         var vector = new RavenVector<float>(embeddings.ToArray());
 
-        var results = await session
+        return await session
             .Query<KnowledgebaseDocumentContentVectorIndex.IndexEntry, KnowledgebaseDocumentContentVectorIndex>()
             .VectorSearch(
                 embeddingFieldFactory: x => x.WithField(doc => doc.Vector),
@@ -36,7 +36,5 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
             .ProjectInto<KnowledgebaseDocumentDbEntity>()
             .Take(10)
             .ToListAsync(cancellationToken);
-
-        return results;
     }
 }

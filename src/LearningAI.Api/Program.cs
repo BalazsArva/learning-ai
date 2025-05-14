@@ -1,14 +1,18 @@
 using System.ClientModel;
 using Azure.AI.OpenAI;
+using LearningAI.Api.Configuration;
 using LearningAI.Api.Persistence;
 using LearningAI.Api.Persistence.RavenDb;
 using LearningAI.Api.RequestHandlers;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Options;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddOptionsWithValidateOnStart<RavenDbOptions>().BindConfiguration(RavenDbOptions.SectionName);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -29,14 +33,15 @@ builder
 builder.Services.AddSingleton<ICreateDocumentRequestHandler, CreateDocumentRequestHandler>();
 builder.Services.AddSingleton<IDocumentAssistantQueryRequestHandler, DocumentAssistantQueryRequestHandler>();
 builder.Services.AddSingleton<IKnowledgebaseDocumentRepository, KnowledgebaseDocumentRepository>();
-builder.Services.AddSingleton((serviceProvider) =>
+builder.Services.AddSingleton(serviceProvider =>
 {
+    var opts = serviceProvider.GetRequiredService<IOptions<RavenDbOptions>>();
+
     return
-        new DocumentStore()
+        new DocumentStore
         {
-            // TODO: Config
-            Database = "learning-ai",
-            Urls = ["http://localhost:8080"],
+            Database = opts.Value.Database,
+            Urls = opts.Value.Urls,
         }
         .Initialize();
 });
@@ -44,7 +49,6 @@ builder.AddOllamaApiClient("ollama", opts => opts.SelectedModel = "all-minilm").
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -52,13 +56,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 await IndexCreation.CreateIndexesAsync(
     typeof(KnowledgebaseDocumentRepository).Assembly,
     app.Services.GetRequiredService<IDocumentStore>());
 
-app.Run();
+await app.RunAsync();
