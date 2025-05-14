@@ -1,48 +1,71 @@
-﻿using LearningAI.Api.Persistence;
+﻿using System.ComponentModel;
+using LearningAI.Api.Persistence;
 using Microsoft.Extensions.AI;
 
 namespace LearningAI.Api.RequestHandlers;
 
 public class DocumentAssistantQueryRequestHandler(
-    IKnowledgebaseDocumentRepository repository,
-    IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
     IChatClient chatClient,
+    Func<KnowledgebaseTools> knowledgebaseToolsFactory,
     ILogger<DocumentAssistantQueryRequestHandler> logger) : IDocumentAssistantQueryRequestHandler
 {
-    private static readonly QueryAssistantResult ResponseForNoMatchingDocuments = new("I'm sorry I could not find any information on what you are looking for.");
-
     public async Task<QueryAssistantResult> QueryAssistantAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
     {
-        var queryEmbedding = await embeddingGenerator.GenerateVectorAsync(request.Query, cancellationToken: cancellationToken);
-        var documents = await repository.SearchDocumentsByContentEmbeddingAsync(queryEmbedding, cancellationToken);
-
-        if (documents.Count == 0)
-        {
-            return ResponseForNoMatchingDocuments;
-        }
-
         // TODO: Try to make it output where it found information (document name/title/whatever)
         var messages = new List<ChatMessage>
         {
             new(
                 ChatRole.System,
                 """
-                You are an assistant who answers inquiries by finding and summarizing the requested information from a company's
-                internal knowledgebase. The following documents contain what you know. Don't make up information, politely answer
-                that you don't know the answer if you cannot find any information on what the user is asking. Your answer should
-                be in markdown format.
+                You are an assistant who answers questions by finding and summarizing the requested information from a company's
+                internal knowledgebase. Use the tools available to you to search for relevant documents. Don't make up information,
+                politely answer that you don't know the answer if you cannot find any information on what the user is asking.
+                Your answer should be in markdown format.
                 """),
+            new(ChatRole.User, request.Query)
         };
 
-        foreach (var document in documents)
+        var assistantResponse = await chatClient.GetResponseAsync(messages, CreateChatOptions(), cancellationToken);
+
+        return new(
+            string.IsNullOrEmpty(assistantResponse.Text)
+                ? "[Warning] No response received from assistant."
+                : assistantResponse.Text);
+    }
+
+    private ChatOptions CreateChatOptions()
+    {
+        var kbTools = knowledgebaseToolsFactory();
+
+        var searchKbTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByContentSemanticsAsync);
+
+        return new ChatOptions
         {
-            messages.Add(new ChatMessage(ChatRole.System, document.Contents));
-        }
+            AllowMultipleToolCalls = true,
+            Tools = [searchKbTool],
+        };
+    }
+}
 
-        messages.Add(new ChatMessage(ChatRole.User, request.Query));
+// TODO: Move elsewhere
+// TODO: Try with interface
+public class KnowledgebaseTools(
+    IKnowledgebaseDocumentRepository repository,
+    IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
+    ILogger<KnowledgebaseTools> logger)
+{
+    [Description("Searches for knowledgebase documents relevant to the specified query, by the documents' and the query's semantics.")]
+    public async Task<IReadOnlyCollection<string>> SearchDocumentsByContentSemanticsAsync(
+        [Description("The query to find relevant documents to.")] string query,
+        CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Searching for documents by query '{Query}'", query);
 
-        var assistantResponse = await chatClient.GetResponseAsync(messages, new ChatOptions(), cancellationToken);
+        var queryEmbedding = await embeddingGenerator.GenerateVectorAsync(query, cancellationToken: cancellationToken);
+        var documents = await repository.SearchDocumentsByContentEmbeddingAsync(queryEmbedding, cancellationToken);
 
-        return new(assistantResponse.Text ?? "[Warning] No response received from assistant.");
+        logger.LogInformation("Search by query {Query} yielded {MatchCount} results.", query, documents.Count);
+
+        return [.. documents.Select(d => d.Contents)];
     }
 }

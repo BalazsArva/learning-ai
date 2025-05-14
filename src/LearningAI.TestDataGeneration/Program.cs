@@ -32,6 +32,6 @@ try
 }
 catch (Exception e)
 {
-    Console.WriteLine($"Application failed to execute. {e.Message}");
+    Console.WriteLine($"Host failed to start: {e.Message}");
     throw;
 }
