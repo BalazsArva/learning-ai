@@ -44,8 +44,8 @@ try
                     .Build();
         });
 
-    builder.Services.AddTransient<KnowledgebaseTools>();
-    builder.Services.AddSingleton<Func<KnowledgebaseTools>>(services => () => services.GetRequiredService<KnowledgebaseTools>());
+    builder.Services.AddTransient<IKnowledgebaseTools, KnowledgebaseTools>();
+    builder.Services.AddSingleton<Func<IKnowledgebaseTools>>(services => () => services.GetRequiredService<IKnowledgebaseTools>());
     builder.Services.AddSingleton<ICreateDocumentRequestHandler, CreateDocumentRequestHandler>();
     builder.Services.AddSingleton<IDocumentAssistantQueryRequestHandler, DocumentAssistantQueryRequestHandler>();
     builder.Services.AddSingleton<IKnowledgebaseDocumentRepository, KnowledgebaseDocumentRepository>();

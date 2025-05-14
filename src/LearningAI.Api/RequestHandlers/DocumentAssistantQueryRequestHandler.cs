@@ -6,7 +6,7 @@ namespace LearningAI.Api.RequestHandlers;
 
 public class DocumentAssistantQueryRequestHandler(
     IChatClient chatClient,
-    Func<KnowledgebaseTools> knowledgebaseToolsFactory,
+    Func<IKnowledgebaseTools> knowledgebaseToolsFactory,
     ILogger<DocumentAssistantQueryRequestHandler> logger) : IDocumentAssistantQueryRequestHandler
 {
     public async Task<QueryAssistantResult> QueryAssistantAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
@@ -47,12 +47,20 @@ public class DocumentAssistantQueryRequestHandler(
     }
 }
 
+public interface IKnowledgebaseTools
+{
+    [Description("Searches for knowledgebase documents relevant to the specified query, by the documents' and the query's semantics.")]
+    Task<IReadOnlyCollection<string>> SearchDocumentsByContentSemanticsAsync(
+        [Description("The query to find relevant documents to.")] string query,
+        CancellationToken cancellationToken);
+}
+
 // TODO: Move elsewhere
 // TODO: Try with interface
 public class KnowledgebaseTools(
     IKnowledgebaseDocumentRepository repository,
     IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
-    ILogger<KnowledgebaseTools> logger)
+    ILogger<KnowledgebaseTools> logger) : IKnowledgebaseTools
 {
     [Description("Searches for knowledgebase documents relevant to the specified query, by the documents' and the query's semantics.")]
     public async Task<IReadOnlyCollection<string>> SearchDocumentsByContentSemanticsAsync(
