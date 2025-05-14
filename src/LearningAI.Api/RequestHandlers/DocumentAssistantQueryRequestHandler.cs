@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using LearningAI.Api.Persistence;
+﻿using LearningAI.Api.AIFunctions;
 using Microsoft.Extensions.AI;
 
 namespace LearningAI.Api.RequestHandlers;
@@ -36,7 +35,6 @@ public class DocumentAssistantQueryRequestHandler(
     private ChatOptions CreateChatOptions()
     {
         var kbTools = knowledgebaseToolsFactory();
-
         var searchKbTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByContentSemanticsAsync);
 
         return new ChatOptions
@@ -44,36 +42,5 @@ public class DocumentAssistantQueryRequestHandler(
             AllowMultipleToolCalls = true,
             Tools = [searchKbTool],
         };
-    }
-}
-
-public interface IKnowledgebaseTools
-{
-    [Description("Searches for knowledgebase documents relevant to the specified query, by the documents' and the query's semantics.")]
-    Task<IReadOnlyCollection<string>> SearchDocumentsByContentSemanticsAsync(
-        [Description("The query to find relevant documents to.")] string query,
-        CancellationToken cancellationToken);
-}
-
-// TODO: Move elsewhere
-// TODO: Try with interface
-public class KnowledgebaseTools(
-    IKnowledgebaseDocumentRepository repository,
-    IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
-    ILogger<KnowledgebaseTools> logger) : IKnowledgebaseTools
-{
-    [Description("Searches for knowledgebase documents relevant to the specified query, by the documents' and the query's semantics.")]
-    public async Task<IReadOnlyCollection<string>> SearchDocumentsByContentSemanticsAsync(
-        [Description("The query to find relevant documents to.")] string query,
-        CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Searching for documents by query '{Query}'", query);
-
-        var queryEmbedding = await embeddingGenerator.GenerateVectorAsync(query, cancellationToken: cancellationToken);
-        var documents = await repository.SearchDocumentsByContentEmbeddingAsync(queryEmbedding, cancellationToken);
-
-        logger.LogInformation("Search by query {Query} yielded {MatchCount} results.", query, documents.Count);
-
-        return [.. documents.Select(d => d.Contents)];
     }
 }

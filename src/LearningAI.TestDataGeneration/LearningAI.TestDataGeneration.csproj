@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="TestData\Knowledgebase\bike-and-scooter-storage.md" />
     <None Remove="TestData\Knowledgebase\health-insurance.md" />
     <None Remove="TestData\Knowledgebase\overtime-policy.md" />
     <None Remove="TestData\Knowledgebase\parking.md" />
@@ -19,6 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="TestData\Knowledgebase\bike-and-scooter-storage.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestData\Knowledgebase\health-insurance.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

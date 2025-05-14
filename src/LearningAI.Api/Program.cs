@@ -1,5 +1,6 @@
 using System.ClientModel;
 using Azure.AI.OpenAI;
+using LearningAI.Api.AIFunctions;
 using LearningAI.Api.Configuration;
 using LearningAI.Api.Persistence;
 using LearningAI.Api.Persistence.RavenDb;
