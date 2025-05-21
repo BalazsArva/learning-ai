@@ -10,7 +10,6 @@ public class DocumentAssistantQueryRequestHandler(
 {
     public async Task<QueryAssistantResult> QueryAssistantAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
     {
-        // TODO: Try to make it output where it found information (document name/title/whatever)
         var messages = new List<ChatMessage>
         {
             new(
