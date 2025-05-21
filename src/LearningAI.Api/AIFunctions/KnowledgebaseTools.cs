@@ -29,7 +29,22 @@ public class KnowledgebaseTools(
 
         var encodedTitle = HttpUtility.UrlEncode(documentTitle);
 
-        // TODO: Return non-mock data
         return $"http://localhost:5011/api/knowledgebase/documents/{encodedTitle}";
+    }
+
+    public async Task<IReadOnlyCollection<CalendarEntry>> GetCalendarForNextNDaysAsync(int daysOffset, CancellationToken cancellationToken)
+    {
+        var now = DateTime.Now;
+        var result = new List<CalendarEntry>();
+        var sign = Math.Sign(daysOffset);
+
+        for (var i = 0; i <= daysOffset; ++i)
+        {
+            var date = now.AddDays(sign * i);
+
+            result.Add(new CalendarEntry(date.DayOfWeek.ToString(), DateOnly.FromDateTime(date)));
+        }
+
+        return result;
     }
 }

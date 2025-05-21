@@ -15,11 +15,15 @@ public class DocumentAssistantQueryRequestHandler(
             new(
                 ChatRole.System,
                 """
-                You are an assistant who answers questions by finding and summarizing the requested information from a company's
-                internal knowledgebase. Use the tools available to you to fulfil the request. Don't make up information,
-                politely reply that you don't know the answer if you cannot find any information on what the user is asking.
-                Your answer should be in markdown format. If you are able to find the requested information, then include the
-                relevant links in your answer as well, at the end.
+                You are an assistant who answers questions by finding and compiling the requested information from a company's internal knowledgebase.
+                
+                Use the tools available to you to search for documents where you may find relevant information or to get any additional required data.
+                
+                Don't make up information, politely reply that you don't know the answer if you cannot find any information on what the user is asking.
+                
+                Your answer should:
+                - be in markdown format
+                - contain URLs which you created that point to the documents you used in the answer.
                 """),
             new(ChatRole.User, request.Query)
         };
@@ -37,11 +41,13 @@ public class DocumentAssistantQueryRequestHandler(
         var kbTools = knowledgebaseToolsFactory();
         var searchKbTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByContentSemanticsAsync);
         var getDocumentUrlTool = AIFunctionFactory.Create(kbTools.GetUriForDocumentAsync);
+        var getFutureDatesWithDayNamesTool = AIFunctionFactory.Create(kbTools.GetCalendarForNextNDaysAsync);
 
         return new ChatOptions
         {
             AllowMultipleToolCalls = true,
-            Tools = [searchKbTool, getDocumentUrlTool],
+            Tools = [searchKbTool, getDocumentUrlTool, getFutureDatesWithDayNamesTool],
+            //ToolMode = ChatToolMode.RequireSpecific(searchKbTool.Name),
         };
     }
 }

@@ -14,6 +14,7 @@
     <None Remove="TestData\Knowledgebase\parking.md" />
     <None Remove="TestData\Knowledgebase\pension-savings.md" />
     <None Remove="TestData\Knowledgebase\pet-policy.md" />
+    <None Remove="TestData\Knowledgebase\remote-work-policy.md" />
     <None Remove="TestData\Knowledgebase\sick-leave-policy.md" />
     <None Remove="TestData\Knowledgebase\travel-compensation.md" />
     <None Remove="TestData\Knowledgebase\using-the-coffee-machine.md" />
@@ -36,6 +37,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\Knowledgebase\pet-policy.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\remote-work-policy.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\Knowledgebase\sick-leave-policy.md">
