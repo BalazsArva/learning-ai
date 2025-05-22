@@ -10,7 +10,13 @@ public interface IKnowledgebaseDocumentRepository
 
     Task<IReadOnlyCollection<KnowledgebaseDocumentDbEntity>> SearchDocumentsByContentEmbeddingAsync(
         ReadOnlyMemory<float> embeddings,
-        CancellationToken cancellationToken);
+        int documentCount = 3,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyCollection<KnowledgebaseDocumentDbEntity>> SearchDocumentsByKeywordsAsync(
+        string searchTerm,
+        int documentCount = 3,
+        CancellationToken cancellationToken = default);
 }
 
 public record KnowledgebaseDocument(

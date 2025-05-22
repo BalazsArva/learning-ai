@@ -5,7 +5,9 @@ namespace LearningAI.Api.Persistence.RavenDb;
 
 public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKnowledgebaseDocumentRepository
 {
-    public async Task SaveDocumentAsync(KnowledgebaseDocument document, CancellationToken cancellationToken)
+    public async Task SaveDocumentAsync(
+        KnowledgebaseDocument document,
+        CancellationToken cancellationToken)
     {
         using var session = documentStore.OpenAsyncSession();
 
@@ -21,7 +23,10 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
         await session.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<KnowledgebaseDocumentDbEntity>> SearchDocumentsByContentEmbeddingAsync(ReadOnlyMemory<float> embeddings, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<KnowledgebaseDocumentDbEntity>> SearchDocumentsByContentEmbeddingAsync(
+        ReadOnlyMemory<float> embeddings,
+        int documentCount = 3,
+        CancellationToken cancellationToken = default)
     {
         using var session = documentStore.OpenAsyncSession();
 
@@ -34,7 +39,22 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
                 embeddingValueFactory: x => x.ByEmbedding(vector),
                 minimumSimilarity: 0.7f)
             .ProjectInto<KnowledgebaseDocumentDbEntity>()
-            .Take(10)
+            .Take(documentCount)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<KnowledgebaseDocumentDbEntity>> SearchDocumentsByKeywordsAsync(
+        string searchTerm,
+        int documentCount = 3,
+        CancellationToken cancellationToken = default)
+    {
+        using var session = documentStore.OpenAsyncSession();
+
+        return await session
+            .Query<KnowledgebaseDocumentDbEntity>()
+            .Search(x => x.Contents, searchTerm, options: SearchOptions.Or)
+            .OrderByScore()
+            .Take(documentCount)
             .ToListAsync(cancellationToken);
     }
 }
