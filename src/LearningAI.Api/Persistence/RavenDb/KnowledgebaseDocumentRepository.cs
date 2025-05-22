@@ -23,7 +23,7 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
         await session.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<KnowledgebaseDocumentDbEntity>> SearchDocumentsByContentEmbeddingAsync(
+    public async Task<IReadOnlyCollection<KnowledgebaseDocument>> SearchDocumentsByContentEmbeddingAsync(
         ReadOnlyMemory<float> embeddings,
         int documentCount = 3,
         CancellationToken cancellationToken = default)
@@ -31,8 +31,7 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
         using var session = documentStore.OpenAsyncSession();
 
         var vector = new RavenVector<float>(embeddings.ToArray());
-
-        return await session
+        var dbEntities = await session
             .Query<KnowledgebaseDocumentContentVectorIndex.IndexEntry, KnowledgebaseDocumentContentVectorIndex>()
             .VectorSearch(
                 embeddingFieldFactory: x => x.WithField(doc => doc.Vector),
@@ -41,20 +40,24 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
             .ProjectInto<KnowledgebaseDocumentDbEntity>()
             .Take(documentCount)
             .ToListAsync(cancellationToken);
+
+        return dbEntities.Select(x => new KnowledgebaseDocument(x.Id, x.Title, x.Contents, x.Embeddings.ToArray())).ToList();
     }
 
-    public async Task<IReadOnlyCollection<KnowledgebaseDocumentDbEntity>> SearchDocumentsByKeywordsAsync(
+    public async Task<IReadOnlyCollection<KnowledgebaseDocument>> SearchDocumentsByKeywordsAsync(
         string searchTerm,
         int documentCount = 3,
         CancellationToken cancellationToken = default)
     {
         using var session = documentStore.OpenAsyncSession();
 
-        return await session
+        var dbEntities = await session
             .Query<KnowledgebaseDocumentDbEntity>()
             .Search(x => x.Contents, searchTerm, options: SearchOptions.Or)
             .OrderByScore()
             .Take(documentCount)
             .ToListAsync(cancellationToken);
+
+        return dbEntities.Select(x => new KnowledgebaseDocument(x.Id, x.Title, x.Contents, x.Embeddings.ToArray())).ToList();
     }
 }
