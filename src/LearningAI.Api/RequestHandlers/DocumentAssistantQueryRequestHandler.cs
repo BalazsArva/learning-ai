@@ -28,6 +28,11 @@ public class DocumentAssistantQueryRequestHandler(
             new(ChatRole.User, request.Query)
         };
 
+        // TODO: Play around with what to do if the references are too large. Ideas:
+        // - Detect when there are too many tokens and only do the search. Return a simple response saying that the documents are too large but
+        //   here are the relevant documents to read more: <link>
+        // - In a separate LLM conversation for each search result, ask if it contains info on what's being asked. If so, ask to summarize
+        //   it/create an extract if the doc contains other unrelated topics and send the shortened form to the main conversation
         var assistantResponse = await chatClient.GetResponseAsync(messages, CreateChatOptions(), cancellationToken);
 
         return new(
