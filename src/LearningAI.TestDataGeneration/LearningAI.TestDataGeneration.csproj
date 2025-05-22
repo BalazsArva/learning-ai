@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <None Remove="TestData\Knowledgebase\bike-and-scooter-storage.md" />
+    <None Remove="TestData\Knowledgebase\employee-referral-program.md" />
     <None Remove="TestData\Knowledgebase\health-insurance.md" />
     <None Remove="TestData\Knowledgebase\overtime-policy.md" />
     <None Remove="TestData\Knowledgebase\parking.md" />
@@ -16,12 +17,17 @@
     <None Remove="TestData\Knowledgebase\pet-policy.md" />
     <None Remove="TestData\Knowledgebase\remote-work-policy.md" />
     <None Remove="TestData\Knowledgebase\sick-leave-policy.md" />
+    <None Remove="TestData\Knowledgebase\software-licenses-policy.md" />
     <None Remove="TestData\Knowledgebase\travel-compensation.md" />
     <None Remove="TestData\Knowledgebase\using-the-coffee-machine.md" />
+    <None Remove="TestData\Knowledgebase\vacation-request-policy.md" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="TestData\Knowledgebase\bike-and-scooter-storage.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\employee-referral-program.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\Knowledgebase\health-insurance.md">
@@ -45,10 +51,16 @@
     <Content Include="TestData\Knowledgebase\sick-leave-policy.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="TestData\Knowledgebase\software-licenses-policy.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestData\Knowledgebase\travel-compensation.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\Knowledgebase\using-the-coffee-machine.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Knowledgebase\vacation-request-policy.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
