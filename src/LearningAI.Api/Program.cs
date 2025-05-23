@@ -5,6 +5,7 @@ using LearningAI.Api.Configuration;
 using LearningAI.Api.Persistence;
 using LearningAI.Api.Persistence.RavenDb;
 using LearningAI.Api.RequestHandlers;
+using LearningAI.Api.Utilities;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Options;
 using Raven.Client.Documents;
@@ -22,6 +23,7 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
+    builder.Services.AddHttpContextAccessor();
     builder.Logging.ClearProviders().AddSerilog(Log.Logger);
 
     builder.Services.AddOptionsWithValidateOnStart<RavenDbOptions>().BindConfiguration(RavenDbOptions.SectionName);
@@ -47,6 +49,7 @@ try
 
     builder.Services.AddTransient<IKnowledgebaseTools, KnowledgebaseTools>();
     builder.Services.AddSingleton<Func<IKnowledgebaseTools>>(services => () => services.GetRequiredService<IKnowledgebaseTools>());
+    builder.Services.AddSingleton<IUriProvider, UriProvider>();
     builder.Services.AddSingleton<ICreateDocumentRequestHandler, CreateDocumentRequestHandler>();
     builder.Services.AddSingleton<IDocumentAssistantQueryRequestHandler, DocumentAssistantQueryRequestHandler>();
     builder.Services.AddSingleton<IKnowledgebaseDocumentRepository, KnowledgebaseDocumentRepository>();
