@@ -1,5 +1,5 @@
-﻿using System.Web;
-using LearningAI.Api.Persistence;
+﻿using LearningAI.Api.Persistence;
+using LearningAI.Api.Utilities;
 using Microsoft.Extensions.AI;
 
 namespace LearningAI.Api.AIFunctions;
@@ -7,6 +7,7 @@ namespace LearningAI.Api.AIFunctions;
 public class KnowledgebaseTools(
     IKnowledgebaseDocumentRepository repository,
     IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
+    IUriProvider uriProvider,
     ILogger<KnowledgebaseTools> logger) : IKnowledgebaseTools
 {
     public async Task<IReadOnlyCollection<string>> SearchDocumentsByContentSemanticsAsync(
@@ -46,7 +47,7 @@ public class KnowledgebaseTools(
         return [.. documents.Select(d => d.Contents)];
     }
 
-    public async Task<IReadOnlyCollection<string>> SearchDocumentsAsync(
+    public async Task<IReadOnlyCollection<SearchDocumentToolResult>> SearchDocumentsAsync(
         string query,
         string[] queryKeywords,
         CancellationToken cancellationToken)
@@ -72,7 +73,10 @@ public class KnowledgebaseTools(
         var resultsFoundInBoth = keywordsSearchResult.IntersectBy(semanticSearchResult.Select(x => x.Id).ToHashSet(), x => x.Id);
         if (resultsFoundInBoth.Any())
         {
-            var strongMatches = resultsFoundInBoth.DistinctBy(x => x.Id).Select(x => x.Contents).ToList();
+            var strongMatches = resultsFoundInBoth
+                .DistinctBy(x => x.Id)
+                .Select(x => new SearchDocumentToolResult(x.Id, x.Title, x.Contents, uriProvider.GetUriForKnowledgebaseDocumentByTitle(x.Title)))
+                .ToList();
 
             logger.LogInformation(
                 "Searching by query {Query} and query keywords {QueryKeywords} yielded {MatchCount} strongly matching documents.",
@@ -83,7 +87,11 @@ public class KnowledgebaseTools(
             return strongMatches;
         }
 
-        var weakMatches = keywordsSearchResult.Concat(semanticSearchResult).DistinctBy(x => x.Id).Select(x => x.Contents).ToList();
+        var weakMatches = keywordsSearchResult
+            .Concat(semanticSearchResult)
+            .DistinctBy(x => x.Id)
+            .Select(x => new SearchDocumentToolResult(x.Id, x.Title, x.Contents, uriProvider.GetUriForKnowledgebaseDocumentByTitle(x.Title)))
+            .ToList();
 
         logger.LogInformation(
             "Searching by query {Query} and query keywords {QueryKeywords} yielded {MatchCountByQuery} and {MatchCountByKeywords} weakly matching documents.",
@@ -93,15 +101,6 @@ public class KnowledgebaseTools(
             keywordsSearchResult.Count);
 
         return weakMatches;
-    }
-
-    public async Task<string> GetUriForDocumentAsync(string documentTitle, CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Getting URL for document '{DocumentTitle}'", documentTitle);
-
-        var encodedTitle = HttpUtility.UrlEncode(documentTitle);
-
-        return $"http://localhost:5011/api/knowledgebase/documents/{encodedTitle}";
     }
 
     public async Task<IReadOnlyCollection<CalendarEntry>> GetCalendarForNextNDaysAsync(int daysOffset, CancellationToken cancellationToken)

@@ -96,7 +96,6 @@ public class DocumentAssistantQueryRequestHandler(
         var kbKeywordsSearchTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByQueryKeywordsAsync);
         */
 
-        var getDocumentUrlTool = AIFunctionFactory.Create(kbTools.GetUriForDocumentAsync);
         var getFutureDatesWithDayNamesTool = AIFunctionFactory.Create(kbTools.GetCalendarForNextNDaysAsync);
         var combinedKbSearchTool = AIFunctionFactory.Create(kbTools.SearchDocumentsAsync);
 
@@ -105,7 +104,7 @@ public class DocumentAssistantQueryRequestHandler(
             Temperature = 0,
             AllowMultipleToolCalls = true,
 
-            Tools = [combinedKbSearchTool, getDocumentUrlTool, getFutureDatesWithDayNamesTool],
+            Tools = [combinedKbSearchTool, getFutureDatesWithDayNamesTool],
             ToolMode = ChatToolMode.RequireSpecific(combinedKbSearchTool.Name),
         };
     }

@@ -15,14 +15,9 @@ public interface IKnowledgebaseTools
         CancellationToken cancellationToken);
 
     [Description("Searches for knowledgebase documents based on the query's semantics and by keywords extracted from the query.")]
-    Task<IReadOnlyCollection<string>> SearchDocumentsAsync(
+    Task<IReadOnlyCollection<SearchDocumentToolResult>> SearchDocumentsAsync(
         [Description("The query by which to find semantically similar documents.")] string query,
         [Description("The keywords extracted from the query by which to search for relevant documents.")] string[] queryKeywords,
-        CancellationToken cancellationToken);
-
-    [Description("Gets the URI for the document with the specified title.")]
-    Task<string> GetUriForDocumentAsync(
-        [Description("The title of the document.")] string documentTitle,
         CancellationToken cancellationToken);
 
     [Description("Gets the calendar - dates and day names - for the specified amount of days.")]
