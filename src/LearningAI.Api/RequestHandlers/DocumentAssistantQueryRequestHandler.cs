@@ -13,6 +13,15 @@ public class DocumentAssistantQueryRequestHandler(
     IUriProvider uriProvider,
     ILogger<DocumentAssistantQueryRequestHandler> logger) : IDocumentAssistantQueryRequestHandler
 {
+    // TODO: Chunk content and save multiple vectors
+    // See https://techcommunity.microsoft.com/blog/azure-ai-services-blog/azure-ai-search-outperforming-vector-search-with-hybrid-retrieval-and-reranking/3929167
+    // Embedding each chunk into its own vector keeps the input within the embedding model’s token limit and enables the entire document to be searchable in an ANN
+    // search index without truncation. Most deep embedding models have a limit of 512 tokens.Ada - 002 has a limit of 8,192 tokens.
+    //
+    // Also, check the limits on the chat LLM and if we exceed or get close to the token limit with the current documents. Instead of whole documents, we could
+    // send the most relevant chunks only. Also see part 4 of the link above for some interesting ideas on chunking (overlapping, generating chunks so all of them
+    // contain context/most relevant keywords/title).
+
     // TODO: Rename
     public async Task<QueryAssistantResult> QueryAssistantAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
     {
