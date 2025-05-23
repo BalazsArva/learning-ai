@@ -44,20 +44,22 @@ public class DocumentAssistantQueryRequestHandler(
     private ChatOptions CreateChatOptions()
     {
         var kbTools = knowledgebaseToolsFactory();
-        var searchKbTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByContentSemanticsAsync);
+
+        /*
+        var kbSemanticSearchTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByContentSemanticsAsync);
+        var kbKeywordsSearchTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByQueryKeywordsAsync);
+        */
+
         var getDocumentUrlTool = AIFunctionFactory.Create(kbTools.GetUriForDocumentAsync);
         var getFutureDatesWithDayNamesTool = AIFunctionFactory.Create(kbTools.GetCalendarForNextNDaysAsync);
-        var searchKbByKeywordsTool = AIFunctionFactory.Create(kbTools.SearchDocumentsByQueryKeywordsAsync);
         var combinedKbSearchTool = AIFunctionFactory.Create(kbTools.SearchDocumentsAsync);
 
         return new ChatOptions
         {
             Temperature = 0,
-
             AllowMultipleToolCalls = true,
-            //Tools = [searchKbTool, getDocumentUrlTool, getFutureDatesWithDayNamesTool, searchKbByKeywordsTool],
-            Tools = [combinedKbSearchTool, getDocumentUrlTool, getFutureDatesWithDayNamesTool],
 
+            Tools = [combinedKbSearchTool, getDocumentUrlTool, getFutureDatesWithDayNamesTool],
             ToolMode = ChatToolMode.RequireSpecific(combinedKbSearchTool.Name),
         };
     }

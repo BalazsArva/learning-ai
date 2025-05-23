@@ -1,6 +1,4 @@
-﻿using LearningAI.Api.Persistence.RavenDb;
-
-namespace LearningAI.Api.Persistence;
+﻿namespace LearningAI.Api.Persistence;
 
 public interface IKnowledgebaseDocumentRepository
 {
