@@ -1,4 +1,6 @@
-﻿using LearningAI.Api.AIFunctions;
+﻿using System.Text.RegularExpressions;
+using LearningAI.Api.AIFunctions;
+using LearningAI.Api.Persistence;
 using Microsoft.Extensions.AI;
 
 namespace LearningAI.Api.RequestHandlers;
@@ -6,8 +8,10 @@ namespace LearningAI.Api.RequestHandlers;
 public class DocumentAssistantQueryRequestHandler(
     IChatClient chatClient,
     Func<IKnowledgebaseTools> knowledgebaseToolsFactory,
+    IKnowledgebaseDocumentRepository repository,
     ILogger<DocumentAssistantQueryRequestHandler> logger) : IDocumentAssistantQueryRequestHandler
 {
+    // TODO: Rename
     public async Task<QueryAssistantResult> QueryAssistantAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
     {
         var messages = new List<ChatMessage>
@@ -33,12 +37,43 @@ public class DocumentAssistantQueryRequestHandler(
         //   here are the relevant documents to read more: <link>
         // - In a separate LLM conversation for each search result, ask if it contains info on what's being asked. If so, ask to summarize
         //   it/create an extract if the doc contains other unrelated topics and send the shortened form to the main conversation
-        var assistantResponse = await chatClient.GetResponseAsync(messages, CreateChatOptions(), cancellationToken);
+        var aiResponse = await chatClient.GetResponseAsync(messages, CreateChatOptions(), cancellationToken);
+
+        var searchResults = await SmartKeywordsSearchAsync(request, cancellationToken);
+        var assistantResponse = string.IsNullOrEmpty(aiResponse.Text)
+            ? "[Warning] No response received from assistant."
+            : aiResponse.Text;
 
         return new(
-            string.IsNullOrEmpty(assistantResponse.Text)
-                ? "[Warning] No response received from assistant."
-                : assistantResponse.Text);
+            assistantResponse,
+            searchResults.Select(x => new KnowledgebaseDocumentSearchResult(x.Id, x.Title, "TODO:URI", "TODO:QUOTE")).ToList());
+    }
+
+    private async Task<IReadOnlyCollection<KnowledgebaseDocument>> SmartKeywordsSearchAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
+    {
+        var messages = new List<ChatMessage>
+        {
+            new(
+                ChatRole.System,
+                """
+                Consider the following search queries entered by users.
+                If the input is a question, transform it to a query that has the same semantics as the question.
+                """),
+            new(ChatRole.User, request.Query)
+        };
+
+        var chatOptions = new ChatOptions { Temperature = 0 };
+        var assistantResponse = await chatClient.GetResponseAsync(messages, chatOptions, cancellationToken);
+
+        var terms = Regex.Split(
+            $"{request.Query} {assistantResponse.Text}",
+            "\\s+",
+            RegexOptions.IgnoreCase,
+            TimeSpan.FromSeconds(1));
+
+        var combinedQuery = string.Join(" ", terms.Distinct().Select(term => $"{term}*"));
+
+        return await repository.SearchDocumentsByKeywordsAsync(combinedQuery, 25, cancellationToken);
     }
 
     private ChatOptions CreateChatOptions()

@@ -1,4 +1,5 @@
-﻿
-namespace LearningAI.Api.RequestHandlers;
+﻿namespace LearningAI.Api.RequestHandlers;
 
-public record QueryAssistantResult(string AssistantResponse);
+public record QueryAssistantResult(
+    string AssistantResponse,
+    IReadOnlyCollection<KnowledgebaseDocumentSearchResult> SearchResults);
