@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using LearningAI.Api.AIFunctions;
 using LearningAI.Api.Persistence;
+using LearningAI.Api.Utilities;
 using Microsoft.Extensions.AI;
 
 namespace LearningAI.Api.RequestHandlers;
@@ -9,6 +10,7 @@ public class DocumentAssistantQueryRequestHandler(
     IChatClient chatClient,
     Func<IKnowledgebaseTools> knowledgebaseToolsFactory,
     IKnowledgebaseDocumentRepository repository,
+    IUriProvider uriProvider,
     ILogger<DocumentAssistantQueryRequestHandler> logger) : IDocumentAssistantQueryRequestHandler
 {
     // TODO: Rename
@@ -39,17 +41,29 @@ public class DocumentAssistantQueryRequestHandler(
         //   it/create an extract if the doc contains other unrelated topics and send the shortened form to the main conversation
         var aiResponse = await chatClient.GetResponseAsync(messages, CreateChatOptions(), cancellationToken);
 
-        var searchResults = await SmartKeywordsSearchAsync(request, cancellationToken);
+        var searchTerms = await GetSearchTermsAsync(request, cancellationToken);
+        var searchResults = await SmartKeywordsSearchAsync(searchTerms, cancellationToken);
         var assistantResponse = string.IsNullOrEmpty(aiResponse.Text)
             ? "[Warning] No response received from assistant."
             : aiResponse.Text;
 
         return new(
             assistantResponse,
-            searchResults.Select(x => new KnowledgebaseDocumentSearchResult(x.Id, x.Title, "TODO:URI", "TODO:QUOTE")).ToList());
+            new(
+                searchTerms,
+                searchResults
+                    .Select(x => new KnowledgebaseDocumentSearchResultItem(x.Id, x.Title, uriProvider.GetUriForKnowledgebaseDocumentByTitle(x.Title), "TODO:QUOTE"))
+                    .ToList()));
     }
 
-    private async Task<IReadOnlyCollection<KnowledgebaseDocument>> SmartKeywordsSearchAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
+    private async Task<IReadOnlyCollection<KnowledgebaseDocument>> SmartKeywordsSearchAsync(IReadOnlyCollection<string> searchTerms, CancellationToken cancellationToken)
+    {
+        var combinedQuery = string.Join(" ", searchTerms.Select(term => $"{term}*"));
+
+        return await repository.SearchDocumentsByKeywordsAsync(combinedQuery, 25, cancellationToken);
+    }
+
+    private async Task<IReadOnlyCollection<string>> GetSearchTermsAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
     {
         var messages = new List<ChatMessage>
         {
@@ -64,16 +78,13 @@ public class DocumentAssistantQueryRequestHandler(
 
         var chatOptions = new ChatOptions { Temperature = 0 };
         var assistantResponse = await chatClient.GetResponseAsync(messages, chatOptions, cancellationToken);
-
         var terms = Regex.Split(
-            $"{request.Query} {assistantResponse.Text}",
+            assistantResponse.Text,
             "\\s+",
             RegexOptions.IgnoreCase,
             TimeSpan.FromSeconds(1));
 
-        var combinedQuery = string.Join(" ", terms.Distinct().Select(term => $"{term}*"));
-
-        return await repository.SearchDocumentsByKeywordsAsync(combinedQuery, 25, cancellationToken);
+        return terms.ToHashSet();
     }
 
     private ChatOptions CreateChatOptions()

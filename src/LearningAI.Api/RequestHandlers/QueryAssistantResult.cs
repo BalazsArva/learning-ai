@@ -2,4 +2,4 @@
 
 public record QueryAssistantResult(
     string AssistantResponse,
-    IReadOnlyCollection<KnowledgebaseDocumentSearchResult> SearchResults);
+    KnowledgebaseDocumentSearchResult SearchResult);
