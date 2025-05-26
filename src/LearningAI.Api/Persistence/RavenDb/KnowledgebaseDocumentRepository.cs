@@ -16,7 +16,7 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
             Id = document.Id,
             Title = document.Title,
             Contents = document.Contents,
-            Embeddings = new RavenVector<float>(document.Embeddings.ToArray()),
+            Embeddings = [.. document.Embeddings.Select(e => new RavenVector<float>(e))],
         };
 
         await session.StoreAsync(entity, cancellationToken);
@@ -41,7 +41,9 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
             .Take(documentCount)
             .ToListAsync(cancellationToken);
 
-        return dbEntities.Select(x => new KnowledgebaseDocument(x.Id, x.Title, x.Contents, x.Embeddings.ToArray())).ToList();
+        return dbEntities
+            .Select(x => new KnowledgebaseDocument(x.Id, x.Title, x.Contents, x.Embeddings.Select(v => v.ToArray()).ToArray()))
+            .ToList();
     }
 
     public async Task<IReadOnlyCollection<KnowledgebaseDocument>> SearchDocumentsByKeywordsAsync(
@@ -58,6 +60,8 @@ public class KnowledgebaseDocumentRepository(IDocumentStore documentStore) : IKn
             .Take(documentCount)
             .ToListAsync(cancellationToken);
 
-        return dbEntities.Select(x => new KnowledgebaseDocument(x.Id, x.Title, x.Contents, x.Embeddings.ToArray())).ToList();
+        return dbEntities
+            .Select(x => new KnowledgebaseDocument(x.Id, x.Title, x.Contents, x.Embeddings.Select(v => v.ToArray()).ToArray()))
+            .ToList();
     }
 }

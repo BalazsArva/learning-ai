@@ -21,4 +21,4 @@ public record KnowledgebaseDocument(
     string Id,
     string Title,
     string Contents,
-    ReadOnlyMemory<float> Embeddings);
+    IReadOnlyCollection<IReadOnlyCollection<float>> Embeddings);

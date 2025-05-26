@@ -10,5 +10,5 @@ public class KnowledgebaseDocumentDbEntity
 
     public string Contents { get; set; } = default!;
 
-    public RavenVector<float> Embeddings { get; set; } = default!;
+    public RavenVector<float>[] Embeddings { get; set; } = default!;
 }
