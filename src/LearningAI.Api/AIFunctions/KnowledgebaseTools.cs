@@ -14,16 +14,6 @@ public class KnowledgebaseTools(
         string query,
         CancellationToken cancellationToken)
     {
-        // TODO: Consider Markdown chunking: https://ravendb.net/docs/article-page/7.0/csharp/ai-integration/generating-embeddings/embeddings-generation-task
-        // If the "theoretically required" document is less focused, then the embedding of the document as a whole may be too different from the embedding of
-        // the query.
-        // To solve this, we can:
-        // - try to chunk the document so that among the chucks' embeddings there will be a much better fitting candidate. Note that in this case multiple
-        //   embeddings of the same document may cause the document to appear in the results, so the same document may be present multiple times. We need to
-        //   select distinct ones so we avoid sending duplicate document contents and causing extra costs.
-        // - lower the similarity score but that risks introducing too dissimilar documents in other cases. The LLM should be able to realize those dissimilar
-        //   docs don't contain the wanted info but the token usage will still be high when sending over the irrelevant documents
-        // - don't set a threshold but always only use at most 1 document only?
         logger.LogInformation("Searching for documents by query '{Query}'", query);
 
         var queryEmbedding = await embeddingGenerator.GenerateVectorAsync(query, cancellationToken: cancellationToken);
