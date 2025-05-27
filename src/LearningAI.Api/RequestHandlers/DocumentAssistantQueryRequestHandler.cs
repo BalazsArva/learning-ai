@@ -13,7 +13,10 @@ public class DocumentAssistantQueryRequestHandler(
     IUriProvider uriProvider,
     ILogger<DocumentAssistantQueryRequestHandler> logger) : IDocumentAssistantQueryRequestHandler
 {
-    private record SearchInputTransformation(bool InputIsTermsQuery, string[] InputVariants);
+    private record SearchInputTransformation(InputKind InputKind, string[] InputVariants);
+
+    private enum InputKind
+    { CannotDecide, TermsQuery, Prompt }
 
     // TODO: Rename
     public async Task<QueryAssistantResult> QueryAssistantAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
@@ -72,20 +75,30 @@ public class DocumentAssistantQueryRequestHandler(
         {
             new(
                 ChatRole.System,
-                """
+                $"""
                 Consider the following search input entered by a user.
-                Decide whether the input is a terms-based query or a question. If it is a question, create a terms-based query with similar
-                meaning and in either case, also provide at most 10 variants of the terms query which has similar meaning but uses common
-                synonyms for the most important phrases in it.
+
+                Your task is to:
+                - Decide the type of the input ({string.Join(" / ", Enum.GetNames<InputKind>())})
+                - If it is a prompt, create up to 10 terms-based queries using the most important terms and their synonyms in the input
+                - If it is a terms-based query, create up to 10 variants of the input using possible synonyms and retain the original meaning
+                - If you cannot decide, don't process the input.
+
+                The terms in the output variants should not contain any stopwords and the words should be singular.
                 """),
-            new(ChatRole.User, request.Query)
+            new(ChatRole.User, request.Query),
         };
 
         var assistantResponse = await chatClient
             .GetResponseAsync<SearchInputTransformation>(messages, new ChatOptions { Temperature = 0 }, cancellationToken: cancellationToken);
 
+        if (assistantResponse.Result.InputKind == InputKind.CannotDecide)
+        {
+            return [request.Query];
+        }
+
         return assistantResponse.Result.InputVariants
-            .Append(assistantResponse.Result.InputIsTermsQuery ? request.Query : string.Empty)
+            .Concat(assistantResponse.Result.InputKind == InputKind.TermsQuery ? [request.Query] : [])
             .Select(x => Regex.Split(x, "\\s+", RegexOptions.IgnoreCase, regexTimeout))
             .SelectMany(x => x)
             .ToHashSet();
