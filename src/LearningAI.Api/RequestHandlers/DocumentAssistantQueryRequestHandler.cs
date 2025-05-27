@@ -13,6 +13,8 @@ public class DocumentAssistantQueryRequestHandler(
     IUriProvider uriProvider,
     ILogger<DocumentAssistantQueryRequestHandler> logger) : IDocumentAssistantQueryRequestHandler
 {
+    private record SearchInputTransformation(bool InputIsTermsQuery, string[] InputVariants);
+
     // TODO: Rename
     public async Task<QueryAssistantResult> QueryAssistantAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
     {
@@ -65,26 +67,28 @@ public class DocumentAssistantQueryRequestHandler(
 
     private async Task<IReadOnlyCollection<string>> GetSearchTermsAsync(QueryAssistantRequest request, CancellationToken cancellationToken)
     {
+        var regexTimeout = TimeSpan.FromSeconds(1);
         var messages = new List<ChatMessage>
         {
             new(
                 ChatRole.System,
                 """
-                Consider the following search queries entered by users.
-                If the input is a question, transform it to a query that has the same semantics as the question.
+                Consider the following search input entered by a user.
+                Decide whether the input is a terms-based query or a question. If it is a question, create a terms-based query with similar
+                meaning and in either case, also provide at most 10 variants of the terms query which has similar meaning but uses common
+                synonyms for the most important phrases in it.
                 """),
             new(ChatRole.User, request.Query)
         };
 
-        var chatOptions = new ChatOptions { Temperature = 0 };
-        var assistantResponse = await chatClient.GetResponseAsync(messages, chatOptions, cancellationToken);
-        var terms = Regex.Split(
-            assistantResponse.Text,
-            "\\s+",
-            RegexOptions.IgnoreCase,
-            TimeSpan.FromSeconds(1));
+        var assistantResponse = await chatClient
+            .GetResponseAsync<SearchInputTransformation>(messages, new ChatOptions { Temperature = 0 }, cancellationToken: cancellationToken);
 
-        return terms.ToHashSet();
+        return assistantResponse.Result.InputVariants
+            .Append(assistantResponse.Result.InputIsTermsQuery ? request.Query : string.Empty)
+            .Select(x => Regex.Split(x, "\\s+", RegexOptions.IgnoreCase, regexTimeout))
+            .SelectMany(x => x)
+            .ToHashSet();
     }
 
     private ChatOptions CreateChatOptions()
