@@ -45,4 +45,4 @@ docker run -d -p 8080:8080 --name ravendb --restart unless-stopped ravendb/raven
 }
 ```
 
-When everything is set up and ready, start the API then the data generator for inserting mock data. The API is accessible by using the [Scalara UI](http://localhost:5011/scalar/).
+When everything is set up and ready, start the API then the data generator for inserting mock data. The API is accessible by using the [Scalar UI](http://localhost:5011/scalar/).
